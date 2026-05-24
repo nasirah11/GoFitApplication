@@ -1,7 +1,15 @@
+
 import 'package:flutter/material.dart';
 import 'main.dart'; // for LoginPage
 import 'ProfilePage.dart'; // for profile page
 import 'TrainerTips.dart'; // for trainer tips page
+import 'DailyChallengePage.dart'; // for daily challenge page
+import 'FeedbackPage.dart'; // for feedback page
+import 'WorkoutPlanPage.dart';
+import 'MealPlanPage.dart';
+import 'GoalProgressPage.dart';
+import 'CommunityFeedPage.dart'; // for community feed page
+import 'RegisterPage.dart'; // for register page
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,7 +22,7 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const WorkoutPage(),
+    const WorkoutPlanPage(),
     const CommunityFeedPage(),
     const ProfilePage(),
   ];
@@ -32,10 +40,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _openTrainerTips() {
+  void _open(Widget page) {
     Navigator.push(
       context,  
-      MaterialPageRoute(builder: (context) => const TrainerTipsPage()),
+      MaterialPageRoute(builder: (context) => page),
     );
   }
 
@@ -54,20 +62,33 @@ class _HomePageState extends State<HomePage> {
           children: [
             const DrawerHeader(
               decoration: BoxDecoration(color: Colors.black87),
-              child: Text(
-                'Menu',
-                style: TextStyle(color: Colors.white, fontSize: 24),
-              ),
+              child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
             ),
             ListTile(
-              leading: const Icon(Icons.play_circle_filled),
+              leading: const Icon(Icons.play_circle_fill),
               title: const Text('Trainer Tips'),
-              onTap: () {
-                Navigator.pop(context); // close drawer
-                _openTrainerTips();
-              },
+              onTap: () => _open(const TrainerTipsPage()),
             ),
-            // You can add Feedback page here later
+            ListTile(
+              leading: const Icon(Icons.local_dining),
+              title: const Text('Meal Plan'),
+              onTap: () => _open(const MealPlanPage()),
+            ),
+            ListTile(
+              leading: const Icon(Icons.flag),
+              title: const Text('Wellness Goals Progress'),
+              onTap: () => _open(const GoalProgressPage()),
+            ),
+            ListTile(
+              leading: const Icon(Icons.bolt),
+              title: const Text('Daily Challenge'),
+              onTap: () => _open(const DailyChallengePage()),
+            ),
+            ListTile(
+              leading: const Icon(Icons.feedback),
+              title: const Text('Feedback'),
+              onTap: () => _open(const FeedbackPage()),
+            ),
           ],
         ),
       ),
@@ -90,36 +111,6 @@ class _HomePageState extends State<HomePage> {
             label: 'Profile',
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ------------------ Subpages -------------------
-
-class WorkoutPage extends StatelessWidget {
-  const WorkoutPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        '🏋️ Workout Programs Coming Soon!',
-        style: TextStyle(fontSize: 18),
-      ),
-    );
-  }
-}
-
-class CommunityFeedPage extends StatelessWidget {
-  const CommunityFeedPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        '💬 Community Feed is under construction.',
-        style: TextStyle(fontSize: 18),
       ),
     );
   }

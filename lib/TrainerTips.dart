@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 // Enum to distinguish content types
-enum ContentType { video, tip }
+// Only 'video' remains as 'tip' is removed
+enum ContentType { video }
 
 // Base class for all content items
 abstract class ContentItem {
@@ -24,14 +25,7 @@ class VideoContentItem extends ContentItem {
   }) : super(title: title, category: category, type: ContentType.video);
 }
 
-// Specific class for Tip content
-class TipContentItem extends ContentItem {
-  TipContentItem({
-    required String title,
-    required String category,
-  }) : super(title: title, category: category, type: ContentType.tip);
-}
-
+// TipContentItem class has been removed
 
 class TrainerTipsPage extends StatefulWidget {
   const TrainerTipsPage({super.key});
@@ -45,7 +39,7 @@ class _TrainerTipsPageState extends State<TrainerTipsPage> {
   String searchQuery = '';
   List<String> savedItems = []; // This will store titles of saved items
 
-  // Master list of all content items (videos and tips)
+  // Master list of all content items (now only videos)
   late final List<ContentItem> _allContent;
 
   // Map to hold YoutubePlayerControllers, keyed by videoId
@@ -58,9 +52,8 @@ class _TrainerTipsPageState extends State<TrainerTipsPage> {
   void initState() {
     super.initState();
 
-    // Populate _allContent with both videos and dummyData tips
+    // Populate _allContent with only video content
     _allContent = [
-      // Video Content
       VideoContentItem(
         videoId: 'cbKkB3POqaY',
         title: 'EASY WORKOUT AT HOME . 25 MINUTES FULL BODY WORKOUT',
@@ -91,7 +84,6 @@ class _TrainerTipsPageState extends State<TrainerTipsPage> {
         title: '10-Minute Guided Meditation: Self-Love | SELF',
         category: 'Meditation', // Assigned to Meditation
       ),
-      // NEW VIDEO for Meal Plan category - only this video here
       VideoContentItem(
         videoId: 'r1OSDnCDoGQ',
         title: 'MEAL PLANNING for Beginners | 6 Easy Steps',
@@ -102,40 +94,28 @@ class _TrainerTipsPageState extends State<TrainerTipsPage> {
         title: '7 Ways to Improve GUT HEALTH',
         category: 'Meal Plan',
       ),
-       VideoContentItem(
+      VideoContentItem(
         videoId: 'FLSA2DVEKlE',
         title: 'HEALTH HACKS | 11 small ways to improve your health',
-        category: 'Meal Plan'
-        ),
-      // Add more videos here with their categories if needed
-
-      // Tip Content (from your dummyData, excluding Meal Plan tips now)
-      TipContentItem(title: 'Meditation Tip 1', category: 'Meditation'),
-      TipContentItem(title: 'Mind Relaxation', category: 'Meditation'),
-      TipContentItem(title: 'Deep Breathing', category: 'Meditation'),
-      TipContentItem(title: 'Pushups', category: 'Simple Workout'),
-      TipContentItem(title: '10 Min Home Workout', category: 'Simple Workout'),
-      TipContentItem(title: 'Stretching', category: 'Simple Workout'),
-      // Removed: 'Healthy Meals', 'Easy Recipes', 'Meal Prep Tips' as per request
+        category: 'Meal Plan',
+      ),
     ];
 
-    // Initialize YoutubePlayerControllers only for video items
+    // Initialize YoutubePlayerControllers for all video items
     for (var item in _allContent) {
-      if (item.type == ContentType.video) {
-        final videoItem = item as VideoContentItem;
-        _youtubeControllersMap[videoItem.videoId] = YoutubePlayerController(
-          initialVideoId: videoItem.videoId,
-          flags: const YoutubePlayerFlags(
-            autoPlay: false,
-            mute: false,
-            disableDragSeek: false,
-            loop: false,
-            isLive: false,
-            forceHD: false,
-            enableCaption: true,
-          ),
-        );
-      }
+      final videoItem = item as VideoContentItem; // Directly cast as _allContent now only contains videos
+      _youtubeControllersMap[videoItem.videoId] = YoutubePlayerController(
+        initialVideoId: videoItem.videoId,
+        flags: const YoutubePlayerFlags(
+          autoPlay: false,
+          mute: false,
+          disableDragSeek: false,
+          loop: false,
+          isLive: false,
+          forceHD: false,
+          enableCaption: true,
+        ),
+      );
     }
 
     // Extract unique categories from _allContent
@@ -215,32 +195,7 @@ class _TrainerTipsPageState extends State<TrainerTipsPage> {
     );
   }
 
-  // Helper to get an icon/color for the tip card based on category
-  Color _getCategoryColor(String category) {
-    switch (category) {
-      case 'Meditation':
-        return Colors.indigo.shade600;
-      case 'Simple Workout':
-        return Colors.teal.shade600;
-      case 'Meal Plan':
-        return Colors.orange.shade600;
-      default:
-        return Colors.grey.shade700;
-    }
-  }
-
-  IconData _getCategoryIcon(String category) {
-    switch (category) {
-      case 'Meditation':
-        return Icons.self_improvement;
-      case 'Simple Workout':
-        return Icons.fitness_center;
-      case 'Meal Plan':
-        return Icons.restaurant_menu;
-      default:
-        return Icons.info_outline;
-    }
-  }
+  // _getCategoryColor and _getCategoryIcon methods have been removed as they are no longer used.
 
   @override
   Widget build(BuildContext context) {
@@ -325,149 +280,55 @@ class _TrainerTipsPageState extends State<TrainerTipsPage> {
               itemBuilder: (context, index) {
                 final item = filteredContent[index];
 
-                if (item.type == ContentType.video) {
-                  final videoItem = item as VideoContentItem;
-                  final controller = _youtubeControllersMap[videoItem.videoId];
+                // Since we removed TipContentItem, we can directly assume it's a VideoContentItem
+                final videoItem = item as VideoContentItem;
+                final controller = _youtubeControllersMap[videoItem.videoId];
 
-                  if (controller == null) return const SizedBox.shrink(); // Should not happen
+                if (controller == null) return const SizedBox.shrink(); // Should not happen
 
-                  return Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 220,
-                          child: YoutubePlayer(
-                            controller: controller,
-                            showVideoProgressIndicator: true,
-                            progressIndicatorColor: Colors.blueAccent,
-                            onReady: () {},
-                          ),
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 220,
+                        child: YoutubePlayer(
+                          controller: controller,
+                          showVideoProgressIndicator: true,
+                          progressIndicatorColor: Colors.blueAccent,
+                          onReady: () {},
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                videoItem.title,
-                                style: const TextStyle(color: Colors.white, fontSize: 16),
-                                softWrap: true,
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                savedItems.contains(videoItem.title) ? Icons.bookmark_added : Icons.bookmark_add,
-                                color: savedItems.contains(videoItem.title) ? Colors.lightBlue : Colors.white,
-                              ),
-                              onPressed: () => _saveItem(videoItem.title),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Divider(color: Colors.grey, height: 1),
-                    ],
-                  );
-                } else if (item.type == ContentType.tip) {
-                  final tipItem = item as TipContentItem;
-                  // For TipCard, we want to align it with video content.
-                  // Since TipCard has a fixed width, wrap it to allow the list to manage sizing.
-                  // Or, better, refactor TipCard to be more flexible, but for now, this works.
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-                    child: _TipCard(
-                      tip: tipItem.title,
-                      categoryColor: _getCategoryColor(tipItem.category),
-                      categoryIcon: _getCategoryIcon(tipItem.category),
-                      onSave: _saveItem,
-                      isSaved: savedItems.contains(tipItem.title),
                     ),
-                  );
-                }
-                return const SizedBox.shrink(); // Fallback for unexpected types
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              videoItem.title,
+                              style: const TextStyle(color: Colors.white, fontSize: 16),
+                              softWrap: true,
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              savedItems.contains(videoItem.title) ? Icons.bookmark_added : Icons.bookmark_add,
+                              color: savedItems.contains(videoItem.title) ? Colors.lightBlue : Colors.white,
+                            ),
+                            onPressed: () => _saveItem(videoItem.title),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(color: Colors.grey, height: 1),
+                  ],
+                );
               },
             ),
       backgroundColor: Colors.black,
-    );
-  }
-}
-
-// Custom Widget for each Tip Card (re-used from previous iteration)
-class _TipCard extends StatelessWidget {
-  final String tip;
-  final Color categoryColor;
-  final IconData categoryIcon;
-  final Function(String) onSave;
-  final bool isSaved;
-
-  const _TipCard({
-    required this.tip,
-    required this.categoryColor,
-    required this.categoryIcon,
-    required this.onSave,
-    required this.isSaved,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.grey[900], // Dark background for the card
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            // Icon/Color placeholder for the "image" part
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: categoryColor,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Icon(
-                categoryIcon,
-                color: Colors.white,
-                size: 30,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    tip,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  // Removed hardcoded category text, as category is now explicitly available via ContentItem
-                ],
-              ),
-            ),
-            IconButton(
-              icon: Icon(
-                isSaved ? Icons.bookmark_added : Icons.bookmark_add,
-                color: isSaved ? Colors.lightBlue : Colors.white,
-                size: 24,
-              ),
-              onPressed: () => onSave(tip),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
